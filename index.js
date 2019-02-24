@@ -2,15 +2,15 @@
 const validate = f=>{
     const m = {}
     f({
-        add: (id, key, fn)=>{
-            m[id] ? m[id].push({key:key, fn:fn}) : m[id] = [{key:key, fn:fn}]
+        add: (id, key, fn, skip=true)=>{
+            m[id] ? m[id].push({key, fn, skip}) : m[id] = [{key, fn, skip}]
 	}
     })
     return o=>Object.entries(m).reduce(
         (p0, [id, arr])=>{
             p0[id] = arr.reduce(
-                (p1, {key, fn})=>{
-                    Object.values(p1).includes(false) ?
+                (p1, {key, fn, skip})=>{
+                    Object.values(p1).includes(false) && skip ?
                         p1[key] = null : p1[key] = fn(o[id]) 
                     return p1
 		}, {}
@@ -43,7 +43,7 @@ const res = require('./index.js')(({add})=>{
     add('name', 'fmt', v=>v.match(/\S+\s+\S+/) ? true : false)
     add('birthday', 'type', v=>toStr.call(v)==='[object Date]')
     add('birthday', 'min', v=>v>=new Date(1900, 1-1, 1))
-    add('birthday', 'max', v=>v<new Date(3000, 12-1, 31))
+    add('birthday', 'max', v=>v<new Date(3000, 1-1, 1))
 })(o)
 
 console.log(res)
